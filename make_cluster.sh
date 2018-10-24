@@ -105,7 +105,7 @@ PARAMETER_OVERRIDES="${PARAMETER_OVERRIDES} K8sNodeCapacity=${K8S_NODE_CAPACITY}
     exit 20
   }
 
-aws cloudformation deploy --stack-name=${CLUSTER_ID} --template-file="${CLUSTER_TEMPLATE}" --capabilities CAPABILITY_IAM \
+aws cloudformation deploy --stack-name="${CLUSTER_ID}" --template-file="${CLUSTER_TEMPLATE}" --capabilities CAPABILITY_IAM \
     --parameter-overrides \
     CmsId="${CLUSTER_ID}" \
     KeyName="${CLUSTER_ID}Key" \
@@ -116,7 +116,7 @@ aws cloudformation deploy --stack-name=${CLUSTER_ID} --template-file="${CLUSTER_
     SSHLocation="${SSH_LOCATION}" \
     K8sNodeCapacity="${K8S_NODE_CAPACITY}" | tee "${CREATED}"
 
-while [ $(jq ". | length" <<< "$(workers)") -lt ${K8S_NODE_CAPACITY} ]; do
+while [[ "$(jq ". | length" <<< "$(workers)")" -lt "${K8S_NODE_CAPACITY}" ]]; do
     sleep ${S_TIME}
     S_TIME=$((S_TIME * S_TIME))
 done
@@ -131,5 +131,5 @@ if [ -z "${KUBERNETES_SERVICE_HOST}" ]; then
 else
   # shellcheck disable=SC1091
     . ./configure | kubectl apply -f -
-    kubectl create secret generic ${CLUSTER_ID}PrivateKey --from-file=${KEYFILE}
+    kubectl create secret generic "${CLUSTER_ID}"PrivateKey --from-file="${KEYFILE}"
 fi
