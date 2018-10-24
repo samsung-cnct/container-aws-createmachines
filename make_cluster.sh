@@ -9,24 +9,24 @@ workers()
 
 create_key_material()
 {
-  if ! shred -z -n5 -u "$KEYFILE" 2>/dev/null
+  if ! shred -z -n5 -u "${KEYFILE}" 2>/dev/null
   then
-    if -f "$KEYFILE"
+    if -f "${KEYFILE}"
     then
-      if ! rm -rf "$KEYFILE" 2>/dev/null
+      if ! rm -rf "${KEYFILE}" 2>/dev/null
       then
-        echo >&2 "Unable to remove existing keyfile: $KEYFILE"
+        echo >&2 "Unable to remove existing keyfile: ${KEYFILE}"
         return 55
       fi
     fi
   fi
 
-  if ! touch "$KEYFILE"; then
-    echo >&2 "Unable to create (touch) new keyfile: $KEYFILE"
+  if ! touch "${KEYFILE}"; then
+    echo >&2 "Unable to create (touch) new keyfile: ${KEYFILE}"
     return 65
   else
-    if ! chmod 0600 "$KEYFILE"; then
-      echo >&2 "Unable to chmod 0600 $KEYFILE"
+    if ! chmod 0600 "${KEYFILE}"; then
+      echo >&2 "Unable to chmod 0600 ${KEYFILE}"
       return 60
     fi
   fi
@@ -34,7 +34,7 @@ create_key_material()
   aws ec2 create-key-pair         \
     --key-name "${CLUSTER_ID}Key" \
     --query 'KeyMaterial'         \
-    --output text >> "$KEYFILE"
+    --output text >> "${KEYFILE}"
 }
 
 create_machines_yaml()
@@ -98,14 +98,14 @@ PARAMETER_OVERRIDES="${PARAMETER_OVERRIDES} K8sNodeCapacity=${K8S_NODE_CAPACITY}
 [[ ! -f "$CLUSTER_TEMPLATE" ]] && \
   {
     echo >&2 """
-    The template '$CLUSTER_TEMPLATE' does not exist in $BASEDIR.
+    The template '${CLUSTER_TEMPLATE}' does not exist in ${BASEDIR}.
     Please fix your '\$INSTANCE_OS_NAME' and/or '\$INSTANCE_OS_VER' env variables
-    to match a template in $BASEDIR.
+    to match a template in ${BASEDIR}.
     """
     exit 20
   }
 
-aws cloudformation deploy --stack-name=${CLUSTER_ID} --template-file="$CLUSTER_TEMPLATE" --capabilities CAPABILITY_IAM \
+aws cloudformation deploy --stack-name=${CLUSTER_ID} --template-file="${CLUSTER_TEMPLATE}" --capabilities CAPABILITY_IAM \
     --parameter-overrides \
     CmsId="${CLUSTER_ID}" \
     KeyName="${CLUSTER_ID}Key" \
