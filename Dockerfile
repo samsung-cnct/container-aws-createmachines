@@ -10,6 +10,6 @@ COPY --from=0 /usr/local/bin /usr/local/bin
 COPY --from=0 /go/bin /usr/local/bin
 COPY configure /
 COPY make_cluster.sh /
-COPY cluster.cf.template /
+COPY cluster*.template /
 
 CMD ["/make_cluster.sh"]
